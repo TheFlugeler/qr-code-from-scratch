@@ -17,8 +17,7 @@ def binary_to_RGB(binary):
     return rgb
 
 mode = "0010"
-pad_byte_1 = "11101100"
-pad_byte_2 = "00010001"
+pad_bytes = ["11101100","00010001"]
 
 character_count = 0 #Must be 9 bits long
 encoding = {
@@ -101,7 +100,17 @@ def data_section(message):
     data += mode
     data += left_pad(dec_to_bin(len(message)),9,"0")
     data += encode(message)
-    data += (8-(len(data)-(len(data)//8)*8))*"0"
+    data += (8-len(data)%8)*"0"
+    no_pad_bytes = 16 - int(len(data)/8)
+    print(no_pad_bytes)
+    for i in range(no_pad_bytes):
+        print(i)
+        print(f"added pad byte {i%2}")
+        data += pad_bytes[i%2]
+    return data
+
+
+print(data_section("HELLO WORLD"))
 
 
 #plt.imsave("output.png",binary_to_RGB(binary))
