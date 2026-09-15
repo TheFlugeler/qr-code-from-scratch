@@ -67,10 +67,13 @@ def encode_message(message,type,version,ec_level):
     else:
         data_words += "0100"
         message_binary = encode_byte(message)
+
     data_words += bh.left_pad(bh.dec_to_bin(len(message)),character_count_length(version,type),"0") #character count
     data_words += message_binary
-    data_words += "0"*(8-(len(data_words)%8))
-    bytes_remaining = int(TOTAL_BYTE_LIMITS[version][ec_level] - (len(data_words)/8))
+
+    data_words += "0"*(8-(len(data_words)%8)) #Getting data words length up to a multiple of 8
+    bytes_remaining = int(TOTAL_BYTE_LIMITS[version][ec_level] - (len(data_words)/8)) #Filling remaining data space with pad bytes
+
     for i in range(bytes_remaining):
         data_words += PAD_BYTES[i%2]
     return data_words

@@ -18,6 +18,13 @@ def dec_to_bin(number):
         number /= 2
     return bit_string[::-1]
 
+def bin_to_dec(word):
+    integer = 0
+    for i in range(8):
+        if word[i] == "1":
+            integer += 2**(7-i)
+    return integer
+
 def left_pad(message, length, character):
     return character*(length-len(message)) + message
 

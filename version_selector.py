@@ -187,7 +187,7 @@ def select_version(message,type,ec_level):
         print("ERROR: Message too large")
         sys.exit()
     
-    print(f"Using version {version_number}")
+    print(f"Using version {version_number}-{ec_level}")
     return version_number
 
 def select_type(message):
