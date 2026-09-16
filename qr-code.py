@@ -9,10 +9,12 @@ import block_creator as bc
 import error_correction as ec
 import message_structure as ms
 import pattern_generator as pg
+import data_write as dw
+import data_mask as dm
 
-message = "This is a fun long message to test the ACCURACY of everything !@#$%^&**()"
-#message = "HELLO WORLD"
-ec_level = "H"
+#message = "https://www.geeksforgeeks.org/python/get-the-logical-xor-of-two-variables-in-python/"
+message = "This should use multiple blocks if i really drag on and on and on and on and on you're taking the piss now OH MY DAYS"
+ec_level = "L"
 
 encoding_type = vs.select_type(message)
 
@@ -44,7 +46,16 @@ print(f"Final data string no bytes: {len(final_data_string)/8}")
 
 (qr_code,reserved_areas) = pg.generate_base(version)
 
+qr_code = dw.write_data(qr_code,reserved_areas,final_data_string)
 
+(qr_code, mask_number) = dm.mask_code(qr_code,reserved_areas)
+
+print(f"Mask number: {mask_number}")
+
+qr_code = dw.write_format_info(qr_code,ec_level,mask_number)
+
+if version >= 7:
+    qr_code = dw.write_version_info(qr_code,version)
 
 def binary_to_RGB(binary):
     rgb = np.zeros(shape=(binary.shape[0],binary.shape[1],3),dtype=np.uint8)
@@ -55,6 +66,7 @@ def binary_to_RGB(binary):
             else:
                 rgb[i,j] = [255,255,255]
     return rgb
+
 
 plt.imsave("outputs/output.png",binary_to_RGB(qr_code))
 plt.imsave("outputs/reserved.png",binary_to_RGB(reserved_areas))

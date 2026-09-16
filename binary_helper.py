@@ -20,13 +20,21 @@ def dec_to_bin(number):
 
 def bin_to_dec(word):
     integer = 0
-    for i in range(8):
+    for i in range(len(word)):
         if word[i] == "1":
-            integer += 2**(7-i)
-    return integer
+            integer += 2**(len(word)-1-i)
+    return int(integer)
 
 def left_pad(message, length, character):
     return character*(length-len(message)) + message
 
 def right_pad(message, length, character):
     return message + character*(length-len(message))
+
+def trim_left(message, character):
+    counter = 0
+    while message[counter] == character:
+        counter += 1
+        if counter == len(message):
+            break
+    return message[counter:]

@@ -60,6 +60,12 @@ def generate_base(version):
 
     (qr_code, reserved_areas) = add_timing_patterns(qr_code, reserved_areas)
 
+    (qr_code, reserved_areas) = add_dark_module(qr_code, reserved_areas)
+
+    reserved_areas = reserve_format_area(reserved_areas)
+
+    if(version >= 7): reserved_areas = reserve_version_area(reserved_areas)
+
     return (qr_code,reserved_areas)
 
 
@@ -70,22 +76,22 @@ def add_finder_patterns(qr_code, reserved_areas):
     (qr_code,reserved_areas) = place_finder_pattern(qr_code, reserved_areas, 0, SIZE-7)
     return (qr_code, reserved_areas)
 
-def place_finder_pattern(qr_code, reserved_areas, x, y):
+def place_finder_pattern(qr_code, reserved_areas, y, x):
     for i in range(8):
         for j in range(8):
-            if(x == 0 and y == 0): reserved_areas[x+i,y+j] = 1
-            elif(x == 0): reserved_areas[x+i,y-1+j] = 1
-            elif(y == 0): reserved_areas[x-1+i,y+j] = 1
+            if(y == 0 and x == 0): reserved_areas[y+i,x+j] = 1
+            elif(y == 0): reserved_areas[y+i,x-1+j] = 1
+            elif(x == 0): reserved_areas[y-1+i,x+j] = 1
 
     for i in range(7):
-        qr_code[x+i,y] = 1
-        qr_code[x+i,y+6] = 1
-        qr_code[x,y+i] = 1
-        qr_code[x+6,y+i] = 1
+        qr_code[y+i,x] = 1
+        qr_code[y+i,x+6] = 1
+        qr_code[y,x+i] = 1
+        qr_code[y+6,x+i] = 1
 
     for i in range(3):
         for j in range(3):
-            qr_code[x+i+2,y+j+2] = 1
+            qr_code[y+i+2,x+j+2] = 1
 
     return (qr_code, reserved_areas)
 
@@ -94,23 +100,23 @@ def add_alignment_patterns(qr_code, reserved_areas):
     locations = ALIGNMENT_LOCATIONS[VERSION]
     if(len(locations) == 0): return (qr_code,reserved_areas)
 
-    for x in locations:
-        for y in locations:
-            (qr_code,reserved_areas) = place_alignment_pattern(qr_code, reserved_areas, x, y)
+    for y in locations:
+        for x in locations:
+            (qr_code,reserved_areas) = place_alignment_pattern(qr_code, reserved_areas, y, x)
 
     return (qr_code,reserved_areas)
 
-def place_alignment_pattern(qr_code, reserved_areas, x, y):
-    if reserved_areas[x,y] == 1: return (qr_code, reserved_areas)
+def place_alignment_pattern(qr_code, reserved_areas, y, x):
+    if reserved_areas[y,x] == 1: return (qr_code, reserved_areas)
 
-    qr_code[x,y] = 1
+    qr_code[y,x] = 1
     for i in range(5):
-        qr_code[x-2+i,y-2] = 1
-        qr_code[x-2+i,y+2] = 1
-        qr_code[x-2,y-2+i] = 1
-        qr_code[x+2,y-2+i] = 1
+        qr_code[y-2+i,x-2] = 1
+        qr_code[y-2+i,x+2] = 1
+        qr_code[y-2,x-2+i] = 1
+        qr_code[y+2,x-2+i] = 1
         for j in range(5):
-            reserved_areas[x-2+i,y-2+j] = 1
+            reserved_areas[y-2+i,x-2+j] = 1
 
     return (qr_code, reserved_areas)
 
@@ -124,3 +130,24 @@ def add_timing_patterns(qr_code, reserved_areas):
             qr_code[i,6] = (i%2)+1
         reserved_areas[i,6] = 1
     return (qr_code, reserved_areas)
+
+def add_dark_module(qr_code, reserved_areas):
+    qr_code[SIZE-8,8] = 1
+    reserved_areas[SIZE-8,8] = 1
+    return (qr_code,reserved_areas)
+
+def reserve_format_area(reserved_areas):
+    for i in range(8):
+        reserved_areas[8,i] = 1
+        reserved_areas[i,8] = 1
+        reserved_areas[8,SIZE-8+i] = 1
+        reserved_areas[SIZE-8+i,8] = 1
+    reserved_areas[8,8] = 1
+    return reserved_areas
+
+def reserve_version_area(reserved_areas):
+    for i in range(3):
+        for j in range(6):
+            reserved_areas[SIZE-11+i,j] = 1
+            reserved_areas[j,SIZE-11+i] = 1
+    return reserved_areas
