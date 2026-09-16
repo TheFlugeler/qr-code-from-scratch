@@ -6,9 +6,13 @@ import version_selector as vs
 import encoding as en
 import binary_helper as bh
 import block_creator as bc
+import error_correction as ec
+import message_structure as ms
+import pattern_generator as pg
 
-message = "This is a test message that should mean that I can test my blocks really really well!!"
-ec_level = "Q"
+message = "This is a fun long message to test the ACCURACY of everything !@#$%^&**()"
+#message = "HELLO WORLD"
+ec_level = "H"
 
 encoding_type = vs.select_type(message)
 
@@ -24,7 +28,33 @@ print(f"Number of code words: {len(data_code_words)}")
 
 blocks = bc.message_to_blocks(data_code_words,version,ec_level)
 
-print("Block sizes:")
+print("BLOCK SIZES:")
 for block in blocks:
-    print(f"\t {len(block)}")
+    print(f"\t{len(block)}")
 
+ec_blocks = ec.generate_ec_code_words(blocks,version,ec_level)
+
+print("EC_BLOCK SIZES:")
+for ec_block in ec_blocks:
+    print(f"\t{len(ec_block)}")
+
+final_data_string = ms.structure_message(blocks,ec_blocks,version)
+
+print(f"Final data string no bytes: {len(final_data_string)/8}")
+
+(qr_code,reserved_areas) = pg.generate_base(version)
+
+
+
+def binary_to_RGB(binary):
+    rgb = np.zeros(shape=(binary.shape[0],binary.shape[1],3),dtype=np.uint8)
+    for i in range(binary.shape[0]):
+        for j in range(binary.shape[1]):
+            if binary[i,j] == 1:
+                rgb[i,j] = [0,0,0]
+            else:
+                rgb[i,j] = [255,255,255]
+    return rgb
+
+plt.imsave("outputs/output.png",binary_to_RGB(qr_code))
+plt.imsave("outputs/reserved.png",binary_to_RGB(reserved_areas))

@@ -55,6 +55,7 @@ for i in range(1,30):
     current = new
 
 for i in range(len(generator_list)):
-    GENERATOR_POLYNOMIALS[i+1] = generator_list[i]
+    if i+1 in [7,10,13,15,16,17,18,20,22,24,26,28,30]:
+        GENERATOR_POLYNOMIALS[i+1] = generator_list[i][::-1]
 
 print(GENERATOR_POLYNOMIALS)
